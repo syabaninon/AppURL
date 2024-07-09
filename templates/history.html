@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .copy-btn {
+            cursor: pointer;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 200px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Generated HTML Files History</h1>
+        <div class="generated-files">
+            <ul class="list-group">
+                {% for file in history %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('download_file', filename=file.filename.split('/')[-1]) }}" target="_blank">{{ file.filename.split('/')[-1] }}</a>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard({{ loop.index0 }})"><i class="fas fa-copy"></i> Copy HTML</button>
+                    <textarea id="htmlContent{{ loop.index0 }}" style="display:none;">{{ file.content }}</textarea>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        function copyToClipboard(index) {
+            var content = document.getElementById('htmlContent' + index).value;
+            navigator.clipboard.writeText(content).then(function() {
+                showToast('HTML content copied to clipboard');
+            }, function(err) {
+                alert('Failed to copy text: ' + err);
+            });
+        }
+
+        function showToast(message) {
+            var toastContainer = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.classList.add('toast', 'show', 'bg-success', 'text-white');
+            toast.innerHTML = `
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            setTimeout(function() {
+                toast.classList.remove('show');
+                toastContainer.removeChild(toast);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
